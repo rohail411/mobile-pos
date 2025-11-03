@@ -1,0 +1,29 @@
+{
+  "name": "mobile-pos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:client": "cd client && npm run build && cd ..",
+    "start": "npm run build:client && node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.6",
+    "nodemon": "^3.1.9",
+    "pdfkit": "^0.16.0",
+    "react-simple-snackbar": "^1.1.11"
+  },
+  "devDependencies": {
+    "vite": "^6.1.0"
+  }
+}

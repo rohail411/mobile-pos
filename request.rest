@@ -1,0 +1,95 @@
+POST http://localhost:8000/api/v1/register
+Content-Type: application/json
+
+{
+    "name": "nABEEL89",
+  "email": "nabeeel@gmail.com",
+  "password": "12345678"
+}
+
+###
+
+POST http://localhost:8000/api/v1/login
+Content-Type: application/json
+
+{
+  "email": "nabeel@gmail.com",
+  "password": "12345678"
+}
+
+###
+
+POST http://localhost:8000/api/v1/brand/createBrand
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YWRlNjdhMDE5MTQyYTNlODJkNThiNSIsImlhdCI6MTczOTYxMDMwMSwiZXhwIjoxNzM5NjUzNTAxfQ.h2tVXaT2mQUt9Mg7KqtftK4nDhe3P0rB7_PIx7GqZs8
+
+
+
+{
+  "name": "ABC Fashion dffd"
+}
+
+
+###
+GET http://localhost:8000/api/brand/getBrandById/:67af048df803f86faca01732
+Content-Type: application/json
+
+{
+
+}
+
+###
+GET http://localhost:8000/api/v1/brand/getAllBrands
+Content-Type: application/json
+
+
+###
+
+PUT http://localhost:8000/api/brand/updateBrand/67af048df803f86faca01732
+Content-Type: application/json
+
+{
+"name":"Apple"
+}
+
+###
+
+DELETE http://localhost:8000/api/v1/brand/deleteBrand/67aefc5723b0fc298e807697
+Content-Type: application/json
+
+
+
+###
+POST http://localhost:8000/api/v1/supplier/createSupplier
+Content-Type: application/json
+
+{
+  "name": "rohail114324",
+  "email": "rohail22@gmail.com"
+}
+
+
+
+####
+DELETE http://localhost:8000/api/v1/supplier/deleteSupplier/67b5f7f232fb7737c97c49f2
+Content-Type: application/json
+
+
+
+###
+POST http://localhost:8000/api/v1/products/createProduct
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjA1N2QzOWIxM2M1YjI3ZTRjNzg1ZSIsImlhdCI6MTc0MDExOTc3OCwiZXhwIjoxNzQwMTYyOTc4fQ.vGD0VCFgq8URzN3bwFY_-eAhQhRMI89tDtonrJNJ5UA
+
+{
+  "brand": "BrandName",
+  "model": "ModelName",
+  "price": 100,
+  "quantity": 10,
+  "type": "TypeName",
+  "imei": "123456789012345",
+  "supplierId": "67b8227b3e475456661fa8dd"
+}
+
+###
+GET http://localhost:8000/assets/index-CyMl5TcL.js/
