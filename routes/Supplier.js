@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const authToken = require("../middlewares/authToken");
 const {
   createSupplier,
   getAllSuppliers,
@@ -8,23 +9,10 @@ const {
   deleteSupplier,
 } = require("../controllers/Supplier");
 
-// create a supplier route
-router.post("/createSupplier", createSupplier);
-
-// get all suppliers route
-
-router.get("/getAllSuppliers", getAllSuppliers);
-
-// get a supplier by id route
-
-router.get("/getSupplierById/:id", getSupplierById);
-
-// update a supplier route
-
-router.put("/updateSupplier/:id", updateSupplier);
-
-// delete a supplier route
-
-router.delete("/deleteSupplier/:id", deleteSupplier);
+router.post("/createSupplier", authToken, createSupplier);
+router.get("/getAllSuppliers", authToken, getAllSuppliers);
+router.get("/getSupplierById/:id", authToken, getSupplierById);
+router.put("/updateSupplier/:id", authToken, updateSupplier);
+router.delete("/deleteSupplier/:id", authToken, deleteSupplier);
 
 module.exports = router;

@@ -38,15 +38,15 @@ const OrderViewDialog = ({ open, onClose, product }) => {
                            
                             <TableRow>
                                 <TableCell>Customer Name</TableCell>
-                                <TableCell>{product.customerName}</TableCell>
+                                <TableCell>{product.customer?.name || 'N/A'}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Customer Phone</TableCell>
-                                <TableCell>{product.customerPhone}</TableCell>
+                                <TableCell>{product.customer?.phone || 'N/A'}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Customer CNIC</TableCell>
-                                <TableCell>{product.customerCnic || 'N/A'}</TableCell>
+                                <TableCell>{product.customer?.cnic || 'N/A'}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Order At</TableCell>

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 // third-party
 import ReactApexChart from 'react-apexcharts';
@@ -25,15 +27,6 @@ const barChartOptions = {
   dataLabels: {
     enabled: false
   },
-  xaxis: {
-    categories: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
-    axisBorder: {
-      show: false
-    },
-    axisTicks: {
-      show: false
-    }
-  },
   yaxis: {
     show: false
   },
@@ -42,19 +35,13 @@ const barChartOptions = {
   }
 };
 
-// ==============================|| MONTHLY BAR CHART ||============================== //
+// ==============================|| MONTHLY BAR CHART - TOP BRANDS ||============================== //
 
-export default function MonthlyBarChart() {
+export default function MonthlyBarChart({ categories = [], data = [] }) {
   const theme = useTheme();
 
-  const { primary, secondary } = theme.palette.text;
-  const info = theme.palette.info.light;
-
-  const [series] = useState([
-    {
-      data: [80, 95, 70, 42, 65, 55, 78]
-    }
-  ]);
+  const { secondary } = theme.palette.text;
+  const info = theme.palette.primary.main;
 
   const [options, setOptions] = useState(barChartOptions);
 
@@ -63,18 +50,36 @@ export default function MonthlyBarChart() {
       ...prevState,
       colors: [info],
       xaxis: {
+        categories,
+        axisBorder: { show: false },
+        axisTicks: { show: false },
         labels: {
           style: {
-            colors: [secondary, secondary, secondary, secondary, secondary, secondary, secondary]
+            colors: categories.map(() => secondary)
           }
         }
       }
     }));
-  }, [primary, info, secondary]);
+  }, [info, secondary, categories]);
+
+  if (!categories.length) {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant="body2" color="text.secondary">
+          No sales this month yet
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box id="chart" sx={{ bgcolor: 'transparent' }}>
-      <ReactApexChart options={options} series={series} type="bar" height={365} />
+      <ReactApexChart options={options} series={[{ name: 'Units Sold', data }]} type="bar" height={365} />
     </Box>
   );
 }
+
+MonthlyBarChart.propTypes = {
+  categories: PropTypes.array,
+  data: PropTypes.array
+};

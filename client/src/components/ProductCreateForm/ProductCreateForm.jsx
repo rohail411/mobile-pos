@@ -8,7 +8,6 @@ import {
   TextField,
   MenuItem,
 } from '@mui/material';
-import { brands } from 'utils/brands';
 import axios from '../../utils/axios';
 import { useSnackbar } from 'react-simple-snackbar';
 
@@ -18,90 +17,88 @@ const ProductCreateForm = ({ open, handleClose, productType = 'new', mode = 'add
     brand: '',
     price: '',
     model: '',
-    imei: '', 
+    imei: '',
     supplierId: '',
-
   });
+  const [errors, setErrors] = useState({});
 
   const [brands, setBrands] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
 
   useEffect(() => {
     fetchBrands();
+    fetchSuppliers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (mode === 'edit') {
       setFormData({
-        ...formData,
-        brand: data.brandId._id,
-        model: data.model,
-        price: data.price,
-        imei: data.imei || '', // Populate IMEI if editing
-        supplierId: data.supplierId?._id, 
-        customerName:data.name,
-        customerCnic:data.cnic,
+        brand: data.brandId?.id || '',
+        model: data.model || '',
+        price: data.price || '',
+        imei: data.imei || '',
+        supplierId: data.supplierId?.id || '',
       });
     }
   }, [data, mode]);
 
-  useEffect(() => {
-    fetchSuppliers();
-  }, []);
-
   const fetchSuppliers = async () => {
     try {
       const response = await axios.get('/api/v1/supplier/getAllSuppliers');
-      console.log('Suppliers:', response.data);
-      const updatedSuppliers = response.data.map((supplier) => ({
+      const updatedSuppliers = (response.data || []).map((supplier) => ({
         label: supplier.name,
-        value: supplier._id,
+        value: supplier.id,
       }));
       setSuppliers(updatedSuppliers);
     } catch (error) {
-      console.log('Error:', error);
-      openSnackbar(error.response.data.message);
+      openSnackbar(error.response?.data?.message || 'Failed to load suppliers');
     }
   }
 
   const fetchBrands = async () => {
     try {
       const response = await axios.get('/api/v1/brand/getAllBrands');
-      console.log('Brands:', response.data);
-      const updatedBrands = response.data.map((brand) => ({
+      const updatedBrands = (response.data || []).map((brand) => ({
         label: brand.name,
-        value: brand._id,
+        value: brand.id,
       }));
       setBrands(updatedBrands);
     } catch (error) {
-      console.log('Error:', error);
-      openSnackbar(error.response.data.message);
+      openSnackbar(error.response?.data?.message || 'Failed to load brands');
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: undefined });
   };
 
-
-
-  
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.brand) newErrors.brand = 'Brand is required';
+    if (productType === 'new' && !formData.supplierId) newErrors.supplierId = 'Supplier is required';
+    if (!formData.model || !formData.model.trim()) newErrors.model = 'Model is required';
+    const priceNum = Number(formData.price);
+    if (!formData.price || Number.isNaN(priceNum) || priceNum <= 0) newErrors.price = 'Price must be greater than 0';
+    if (!formData.imei || !formData.imei.trim()) newErrors.imei = 'IMEI is required';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    if (!validate()) return;
     try {
       let url = '/api/v1/products';
       if (mode === 'edit') {
-        url = `/api/v1/products/${data._id}`;
+        url = `/api/v1/products/${data.id}`;
       }
       const response = await axios[mode === 'add' ? 'post' : 'put'](url, { ...formData, type: productType });
-      console.log('Product created:', response.data);
       openSnackbar(response.data.message);
     } catch (error) {
-      console.log('Error: failed to save', error);
-      openSnackbar(error.response.data.message);
+      openSnackbar(error.response?.data?.message || 'Failed to save mobile');
     }
     handleClose();
   };
@@ -120,6 +117,8 @@ const ProductCreateForm = ({ open, handleClose, productType = 'new', mode = 'add
             value={formData.brand}
             onChange={handleChange}
             required
+            error={Boolean(errors.brand)}
+            helperText={errors.brand}
           >
             {brands.map((option) => (
               <MenuItem key={option.value} value={option.value}>
@@ -136,6 +135,8 @@ const ProductCreateForm = ({ open, handleClose, productType = 'new', mode = 'add
             value={formData.supplierId}
             onChange={handleChange}
             required
+            error={Boolean(errors.supplierId)}
+            helperText={errors.supplierId}
           >
             {suppliers.map((option) => (
               <MenuItem key={option.value} value={option.value}>
@@ -152,58 +153,39 @@ const ProductCreateForm = ({ open, handleClose, productType = 'new', mode = 'add
             value={formData.model}
             onChange={handleChange}
             required
+            error={Boolean(errors.model)}
+            helperText={errors.model}
           />
           <TextField
             margin="dense"
             name="price"
             label="Price"
             type="number"
-            fullWidth 
+            fullWidth
             value={formData.price}
             onChange={handleChange}
             required
+            error={Boolean(errors.price)}
+            helperText={errors.price}
           />
           <TextField
             margin="dense"
             name="imei"
-            label="IMEI Number" 
+            label="IMEI Number"
             type="text"
             fullWidth
             value={formData.imei}
             onChange={handleChange}
             required
+            error={Boolean(errors.imei)}
+            helperText={errors.imei}
           />
 
-<TextField
-            margin="dense"
-            name="customerName"
-            label="Customer Name"
-            type="text"
-            fullWidth
-            value={formData.customerName}
-            onChange={handleChange}
-            required
-          />
-
-<TextField
-            margin="dense"
-            name="customerCnic"
-            label="Customer CNIC"
-            type="text"
-            fullWidth
-            value={formData.customerCnic}
-            onChange={handleChange}
-            required
-          />
-
-          
-          
-         
           <DialogActions>
-            <Button onClick={handleClose} variant="outlined" color="error">
+            <Button onClick={handleClose} variant="outlined" color="primary">
               Cancel
             </Button>
-            <Button type="submit" variant="outlined" color="primary">
+            <Button type="submit" variant="contained" color="primary">
               Save
             </Button>
           </DialogActions>

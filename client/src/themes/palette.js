@@ -30,6 +30,10 @@ export default function Palette(mode, presetColor) {
 
   colors.grey = [...greyPrimary, ...greyAscent, ...greyConstant];
 
+  // custom retail/inventory palette: deep slate-navy primary, warm amber/teal accent
+  colors.blue = ['#eaf0f6', '#c7d6e6', '#a1bad4', '#7a9ec1', '#5482ad', '#22406B', '#1c3559', '#152840', '#0f1d2e', '#0a141f'];
+  colors.teal = ['#e6f6f4', '#bfe9e3', '#93dbd0', '#67cdbd', '#3fbfab', '#0f9d8a', '#0c8074', '#0a655c', '#074c45', '#053430'];
+
   const paletteColor = ThemeOption(colors, presetColor, mode);
 
   return createTheme({
