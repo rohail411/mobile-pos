@@ -3,6 +3,7 @@ client/node_modules
 client/dist
 client/dist/*
 data/*
+/release
 .env
 client/.env
 client/dist

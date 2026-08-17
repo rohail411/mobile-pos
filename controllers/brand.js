@@ -1,72 +1,53 @@
-const Brand = require("../models/brand");
-
-//create new brand
+const brands = require("../db/brands");
 
 const createBrand = async (req, res) => {
-  console.log("Request body:", req.body);
   try {
-    const { name, description } = req.body;
-    const isExistBrand = await Brand.findOne({ name: name });
-    if (isExistBrand)
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ message: "Name is required" });
+    if (brands.findAll().some((b) => b.name.toLowerCase() === name.toLowerCase())) {
       return res.status(400).json({ message: "Brand already exists" });
-    const brand = new Brand({ name, description });
-    await brand.save();
-    res.status(201).json({ message: "Brand saved successfully" });
+    }
+    const brand = brands.create({ name });
+    res.status(201).json({ message: "Brand saved successfully", brand });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-//get all brands
-
 const getAllBrands = async (req, res) => {
   try {
-    const brands = await Brand.find();
-    res.status(200).json(brands);
+    res.status(200).json(brands.findAll());
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-//get single brand
-
 const getBrandById = async (req, res) => {
   try {
-    const brand = await Brand.findById(req.params.id);
+    const brand = brands.findById(req.params.id);
     if (!brand) return res.status(404).json({ message: "brand not found" });
-
     res.status(200).json(brand);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-//update brand
-
 const updateBrand = async (req, res) => {
   try {
-    const brand = await Brand.findByIdAndUpdate(
-      req.params.id,
-      { ...req.body, sku: req.body.name.toLowerCase().replaceAll(" ", "-") },
-      {
-        new: true,
-      }
-    );
-    if (!brand) return res.status(404).json({ message: "brand not found" });
-
-    res.status(200).json({ message: "brand updated successfully" });
+    const existing = brands.findById(req.params.id);
+    if (!existing) return res.status(404).json({ message: "brand not found" });
+    const brand = brands.update(req.params.id, { name: req.body.name });
+    res.status(200).json({ message: "brand updated successfully", brand });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-//delete brand
-
 const deleteBrand = async (req, res) => {
   try {
-    const brand = await Brand.findByIdAndDelete(req.params.id);
-    if (!brand) return res.status(404).json({ message: "brand not found" });
-
+    const existing = brands.findById(req.params.id);
+    if (!existing) return res.status(404).json({ message: "brand not found" });
+    brands.remove(req.params.id);
     res.status(200).json({ message: "brand deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });

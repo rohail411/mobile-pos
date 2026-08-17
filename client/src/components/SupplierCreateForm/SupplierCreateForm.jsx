@@ -38,7 +38,7 @@ const SupplierCreateForm = ({ open, handleClose, mode = "add", data }) => {
     try {
       let url = '/api/v1/supplier/createSupplier';
       if (mode === 'edit') {
-        url = `/api/v1/supplier/updateSupplier/${data._id}`;
+        url = `/api/v1/supplier/updateSupplier/${data.id}`;
       }
       const response = await axios[mode === 'add' ? 'post' : 'put'](url, { ...formData });
       openSnackbar(response.data.message);
@@ -75,10 +75,10 @@ const SupplierCreateForm = ({ open, handleClose, mode = "add", data }) => {
             required
           />
           <DialogActions>
-            <Button onClick={handleClose} variant="outlined" color="error">
+            <Button onClick={handleClose} variant="outlined" color="primary">
               Cancel
             </Button>
-            <Button type="submit" variant="outlined" color="primary">
+            <Button type="submit" variant="contained" color="primary">
               Save
             </Button>
           </DialogActions>

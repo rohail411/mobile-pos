@@ -5,6 +5,37 @@ const path = require("path");
 const columnWidths = [200, 100, 150, 150, 100];
 const rowHeight = 30;
 
+function resolveReportsDir() {
+  try {
+    const { app } = require("electron");
+    if (app) {
+      const dir = path.join(app.getPath("userData"), "reports");
+      fs.mkdirSync(dir, { recursive: true });
+      return dir;
+    }
+  } catch (err) {
+    // not running inside Electron
+  }
+  const dir = path.join(__dirname, "..", "data");
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+function cleanupOldReports(dir) {
+  const maxAgeMs = 7 * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  try {
+    for (const file of fs.readdirSync(dir)) {
+      if (!file.endsWith("-orders.pdf")) continue;
+      const filePath = path.join(dir, file);
+      const { mtimeMs } = fs.statSync(filePath);
+      if (now - mtimeMs > maxAgeMs) fs.unlinkSync(filePath);
+    }
+  } catch (err) {
+    // best-effort cleanup only
+  }
+}
+
 function drawTableRow(doc, y, row, isHeader = false) {
   let x = 50; // Starting x position
 
@@ -59,11 +90,14 @@ function drawTableRow(doc, y, row, isHeader = false) {
  * @param {Array} records - The array of records to include in the PDF.
  * @returns {Promise<string>} - The path to the generated PDF file.
  */
-module.exports = async (records) => {
+const generatePDF = async (records) => {
   return new Promise((resolve, reject) => {
+    const reportsDir = resolveReportsDir();
+    cleanupOldReports(reportsDir);
+
     const doc = new PDFDocument({ margin: 50, size: [800, 1000] });
     const fileName = `${Date.now()}-orders.pdf`;
-    const filePath = path.join(__dirname, "..", "data", fileName);
+    const filePath = path.join(reportsDir, fileName);
     const writeStream = fs.createWriteStream(filePath);
     doc.pipe(writeStream);
 
@@ -121,8 +155,7 @@ module.exports = async (records) => {
     // Finalize the PDF
     doc.end();
     writeStream.on("finish", () => {
-      console.log("PDF created successfully!");
-      resolve(`/data/${fileName}`);
+      resolve(`/reports/${fileName}`);
     });
     writeStream.on("error", (error) => {
       console.error("Error creating PDF:", error);
@@ -130,3 +163,6 @@ module.exports = async (records) => {
     });
   });
 };
+
+module.exports = generatePDF;
+module.exports.resolveReportsDir = resolveReportsDir;

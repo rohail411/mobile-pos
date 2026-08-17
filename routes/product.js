@@ -6,20 +6,15 @@ const {
   getAllProducts,
   updateProduct,
   deleteProduct,
+  getStats,
 } = require("../controllers/product");
 
 const router = express.Router();
 
-// Create a new product
 router.post("/", authToken, createProduct);
-
-// Get all products
 router.get("/", authToken, getAllProducts);
-
-// Update a product
+router.get("/stats", authToken, getStats);
 router.put("/:id", authToken, updateProduct);
-
-// Delete a product
 router.delete("/:id", authToken, deleteProduct);
 
 module.exports = router;

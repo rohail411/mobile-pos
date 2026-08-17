@@ -14,6 +14,8 @@ const Shadow = Loadable(lazy(() => import('pages/component-overview/shadows')));
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/index')));
 import Brands from 'pages/brands/brands';
 import Supplier from 'pages/supplier/Supplier';
+import Customers from 'pages/customers';
+import Users from 'pages/users';
 // render - sample page
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
 
@@ -71,6 +73,14 @@ const MainRoutes = {
     {
       path:'supplier',
       element: <Supplier/>
+    },
+    {
+      path: 'customers',
+      element: <Customers/>
+    },
+    {
+      path: 'users',
+      element: <Users/>
     }
   ]
 };

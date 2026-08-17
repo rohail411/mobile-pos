@@ -12,8 +12,15 @@ import {
   Toolbar,
   Typography,
   DialogContent,
-  DialogActions
+  DialogActions,
+  IconButton,
+  Tooltip,
+  Stack,
+  Box
 } from '@mui/material';
+import EditOutlined from '@ant-design/icons/EditOutlined';
+import DeleteOutlined from '@ant-design/icons/DeleteOutlined';
+import TagsOutlined from '@ant-design/icons/TagsOutlined';
 import ProductCreateForm from 'components/ProductCreateForm/ProductCreateForm';
 import PropTypes from 'prop-types';
 import CustomDialog from 'components/Dialog/Dialog';
@@ -39,13 +46,10 @@ const BrandDataTable = ({productType = 'new'}) => {
 
   const getProducts = async () => {
     try {
-      console.log('Product Type:', productType);
       const response = await axios.get('/api/v1/brand/getAllBrands', {params: {type: productType}});
-      console.log('Products:', response.data);
       setData(response.data);
     } catch (error) {
-      console.log('Error:', error);
-      openSnackbar(error.response.data.message);
+      openSnackbar(error.response?.data?.message || 'Failed to load brands');
     }
   }
 
@@ -66,30 +70,28 @@ const BrandDataTable = ({productType = 'new'}) => {
   };
 
   const handleConfirmDelete = async () => {
-    const id = showDeleteDialog.data._id;
+    const id = showDeleteDialog.data.id;
     try {
       const response = await axios.delete(`/api/v1/brand/deleteBrand/${id}`);
-      setData(data.filter((item) => item.id !== showDeleteDialog.data.id));
+      setData(data.filter((item) => item.id !== id));
       setShowDeleteDialog({open: false, data: {}});
       openSnackbar(response.data.message);
     } catch (error) {
-      console.log('Error:', error);  
-      openSnackbar(error.response.data.message);   
+      openSnackbar(error.response?.data?.message || 'Failed to delete brand');
     }
- 
   }
 
   return (
     <Paper>
       {showDeleteDialog.open && (<CustomDialog title="Delete Brand" open={showDeleteDialog.open} handleClose={()=> setShowDeleteDialog({open: false, data: {}})}>
       <DialogContent>
-          Are you sure you want to delete "{showDeleteDialog.data.name}" it?
+          Are you sure you want to delete &quot;{showDeleteDialog.data.name}&quot;?
         </DialogContent>
         <DialogActions>
           <Button onClick={()=>setShowDeleteDialog({open: false, data: {}})} variant='outlined' color="primary">
             Cancel
           </Button>
-          <Button onClick={handleConfirmDelete} variant='outlined' color="error">
+          <Button onClick={handleConfirmDelete} variant='contained' color="error">
             Delete
           </Button>
         </DialogActions>
@@ -105,17 +107,15 @@ const BrandDataTable = ({productType = 'new'}) => {
         </CustomDialog>)
       }
       {openProductForm.open && <BrandCreateForm open={openProductForm.open} mode={openProductForm.mode} data={openProductForm.data} handleClose={()=> setOpenProductForm({open: false, mode: 'add', data: {}})} />}
-      <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          
-        </Typography>
+      <Toolbar sx={{ flexWrap: 'wrap', gap: 1 }}>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} />
         <TextField
           variant="outlined"
           placeholder="Search by brand"
           value={searchTerm}
           onChange={handleSearchChange}
           size="small"
-          sx={{ marginRight: 2 }}
+          sx={{ marginRight: 2, minWidth: 220 }}
         />
         <Button variant="contained" color="primary" onClick={()=>setOpenProductForm({open: true, mode:'add', data: {}})}>Add Brand</Button>
       </Toolbar>
@@ -123,34 +123,43 @@ const BrandDataTable = ({productType = 'new'}) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
+              <TableCell>#</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Sku</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
+            {filteredData.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  <Box sx={{ py: 4 }}>
+                    <TagsOutlined style={{ fontSize: 28, opacity: 0.4 }} />
+                    <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+                      No brands yet
+                    </Typography>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            )}
             {filteredData.map((row, i) => (
-              <TableRow key={i}>
+              <TableRow key={row.id ?? i} hover>
                 <TableCell>{i+1}</TableCell>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>{row.sku}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => handleEdit(row)}
-                    sx={{ marginRight: 1 }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => handleDelete(row)}
-                  >
-                    Delete
-                  </Button>
+                <TableCell align="right">
+                  <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                    <Tooltip title="Edit">
+                      <IconButton size="small" color="primary" onClick={() => handleEdit(row)}>
+                        <EditOutlined />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <IconButton size="small" color="error" onClick={() => handleDelete(row)}>
+                        <DeleteOutlined />
+                      </IconButton>
+                    </Tooltip>
+                  </Stack>
                 </TableCell>
               </TableRow>
             ))}
@@ -162,5 +171,9 @@ const BrandDataTable = ({productType = 'new'}) => {
 };
 
 
+
+BrandDataTable.propTypes = {
+  productType: PropTypes.string,
+};
 
 export default BrandDataTable;

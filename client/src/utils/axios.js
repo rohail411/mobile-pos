@@ -1,12 +1,22 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:8000';
-axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
-// i want to intercept the request and check status if token is invalid the user should be logged out
+// The client is served by the same Express server that hosts the API
+// (see root index.js / electron/main.js), so requests should stay
+// relative to the current origin rather than a hardcoded dev port.
+axios.defaults.baseURL = '/';
+
+axios.interceptors.request.use((requestConfig) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    requestConfig.headers.Authorization = `Bearer ${token}`;
+  }
+  return requestConfig;
+});
+
 axios.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response.status === 401) {
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
       localStorage.removeItem('token');
       window.location = '/login';
     }

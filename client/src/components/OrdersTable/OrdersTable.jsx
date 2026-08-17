@@ -12,13 +12,19 @@ import {
   Toolbar,
   Chip,
   MenuItem,
-  Grid
+  Grid,
+  Skeleton,
+  Typography,
+  Box
 } from '@mui/material';
+import EyeOutlined from '@ant-design/icons/EyeOutlined';
+import FileTextOutlined from '@ant-design/icons/FileTextOutlined';
 import axios from '../../utils/axios';
 import OrderViewDialog from 'components/OrderViewDialog/OrderViewDialog';
 
 const OrdersTable = () => {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [order, setOrder] = useState('desc');
   const [dateFilter, setDateFilter] = useState({year: true});
@@ -26,14 +32,18 @@ const OrdersTable = () => {
 
   useEffect(() => {
       getProducts();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [order, dateFilter]);
 
   const getProducts = async () => {
+    setLoading(true);
     try {
       const response = await axios.get('/api/v1/orders', {params: {order: order, ...dateFilter}});
-      setData(response.data.orders);
+      setData(response.data.orders || []);
     } catch (error) {
-      console.log('Error:', error);
+      // keep previous data on failure
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -42,7 +52,7 @@ const OrdersTable = () => {
   };
 
   const filteredData = data.filter((row) =>
-    row.customerName.toLowerCase().includes(searchTerm.toLowerCase())
+    (row.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleDownloadReport = async () => {
@@ -51,7 +61,7 @@ const OrdersTable = () => {
       const pdfPath = response.data.pdfPath;
       window.open(pdfPath, '_blank');
     } catch (error) {
-      console.log('Error:', error);
+      // ignore, nothing to open
     }
   }
 
@@ -65,7 +75,7 @@ const OrdersTable = () => {
       <Toolbar>
         <Grid container>
             <Grid item xs={12} sm={6}>
-               
+
                 </Grid>
                 <Grid item xs={12} sm={6} style={{display: 'flex', justifyContent: 'end', alignItems: 'center'}}>
                 <TextField
@@ -110,7 +120,7 @@ const OrdersTable = () => {
             </TextField>
         <Button variant="contained" color="primary" onClick={handleDownloadReport}>Download Report</Button>
                 </Grid>
-        </Grid>        
+        </Grid>
 
       </Toolbar>
       <TableContainer>
@@ -123,24 +133,43 @@ const OrdersTable = () => {
               <TableCell>Price</TableCell>
               <TableCell>Sold Price</TableCell>
               <TableCell>Type</TableCell>
-              
+              <TableCell>Customer</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredData.map((row, i) => (
-              <TableRow key={i}>
+            {loading && Array.from({ length: 5 }).map((_, idx) => (
+              <TableRow key={`skeleton-${idx}`}>
+                {Array.from({ length: 8 }).map((__, cellIdx) => (
+                  <TableCell key={cellIdx}><Skeleton variant="text" /></TableCell>
+                ))}
+              </TableRow>
+            ))}
+            {!loading && filteredData.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={8} align="center">
+                  <Box sx={{ py: 4 }}>
+                    <FileTextOutlined style={{ fontSize: 28, opacity: 0.4 }} />
+                    <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+                      No sales recorded yet
+                    </Typography>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            )}
+            {!loading && filteredData.map((row, i) => (
+              <TableRow key={row.id ?? i}>
                 <TableCell>{i+1}</TableCell>
                 <TableCell>{row.brand}</TableCell>
                 <TableCell>{row.model}</TableCell>
                 <TableCell >{row.price}</TableCell>
                 <TableCell>{row.sellPrice}</TableCell>
-                
-                {row.type==='new' ? <TableCell><Chip label={row.type} style={{ backgroundColor: 'green', color: 'white' }} /></TableCell>: 
-                <TableCell><Chip label={row.type} style={{ backgroundColor: 'orange', color: 'white' }} /></TableCell>}
 
+                {row.type==='new' ? <TableCell><Chip label={row.type} color="success" /></TableCell>:
+                <TableCell><Chip label={row.type} color="warning" /></TableCell>}
+                <TableCell>{row.customer?.name || '-'}</TableCell>
                 <TableCell>
-                  <Button variant='outlined' onClick={()=> handleViewOrder(row)} color='info'>View Details</Button>
+                  <Button variant='outlined' startIcon={<EyeOutlined />} onClick={()=> handleViewOrder(row)} color='info'>View Details</Button>
                 </TableCell>
               </TableRow>
             ))}

@@ -1,13 +1,19 @@
 import React from 'react'
-import { Grid } from '@mui/material';
+import { Grid, Typography, Box } from '@mui/material';
 import SupplierDataTable from 'components/SupplierDataTable/SupplierDataTable';
-// import BrandDataTable from 'components/BrandDataTable/BrandDataTable';
-// import BrandCreateForm from 'components/BrandCreateForm/BrandCreateForm';
 
 
 const Supplier = () => {
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
+            <Grid item xs={12}>
+                <Box>
+                    <Typography variant="h5">Suppliers</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Manage the suppliers you purchase new stock from
+                    </Typography>
+                </Box>
+            </Grid>
             <Grid item xs={12} >
                 <SupplierDataTable/>
 

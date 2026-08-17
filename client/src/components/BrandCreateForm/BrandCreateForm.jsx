@@ -48,7 +48,7 @@ const BrandCreateForm = ({open, handleClose, mode="add", data}) => {
     try {
         let url = '/api/v1/brand/createBrand';
         if(mode === 'edit') {
-            url = `/api/v1/brand/updateBrand/${data._id}`;
+            url = `/api/v1/brand/updateBrand/${data.id}`;
         }
         // axios.post()
         // axios['post']()
@@ -82,10 +82,10 @@ const BrandCreateForm = ({open, handleClose, mode="add", data}) => {
 
         
             <DialogActions>
-              <Button onClick={handleClose} variant="outlined" color="error">
+              <Button onClick={handleClose} variant="outlined" color="primary">
                 Cancel
               </Button>
-              <Button type="submit" variant="outlined" color="primary">
+              <Button type="submit" variant="contained" color="primary">
                 Save
               </Button>
             </DialogActions>

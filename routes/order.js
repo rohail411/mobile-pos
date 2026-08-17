@@ -5,17 +5,14 @@ const {
   createOrder,
   getAllOrders,
   downloadReport,
+  getStats,
 } = require("../controllers/order");
 
 const router = express.Router();
 
-// Create a new order
 router.post("/", authToken, createOrder);
-
-// Get all orders
 router.get("/", authToken, getAllOrders);
-
-// Download report
+router.get("/stats", authToken, getStats);
 router.get("/download-report", authToken, downloadReport);
 
 module.exports = router;

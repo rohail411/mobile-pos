@@ -1,7 +1,7 @@
 // ==============================|| PRESET THEME - THEME SELECTOR ||============================== //
 
 export default function Theme(colors) {
-  const { blue, red, gold, cyan, green, grey } = colors;
+  const { blue, red, gold, cyan, green, grey, teal } = colors;
   const greyColors = {
     0: grey[0],
     50: grey[1],
@@ -38,20 +38,20 @@ export default function Theme(colors) {
       contrastText
     },
     secondary: {
-      lighter: greyColors[100],
-      100: greyColors[100],
-      200: greyColors[200],
-      light: greyColors[300],
-      400: greyColors[400],
-      main: greyColors[500],
-      600: greyColors[600],
-      dark: greyColors[700],
-      800: greyColors[800],
-      darker: greyColors[900],
+      lighter: teal[0],
+      100: teal[1],
+      200: teal[2],
+      light: teal[3],
+      400: teal[4],
+      main: teal[5],
+      600: teal[6],
+      dark: teal[7],
+      800: teal[8],
+      darker: teal[9],
       A100: greyColors[0],
       A200: greyColors.A400,
       A300: greyColors.A700,
-      contrastText: greyColors[0]
+      contrastText: '#fff'
     },
     error: {
       lighter: red[0],
